@@ -34,7 +34,7 @@
 ;                 chip-xnor()
 
 
-; Proposito: Construir un TAD para el lenguaje de programación de circuitos
+; Proposito: Construir un TAD basado en listas para el lenguaje de programación de circuitos
 ;            digitales LCD.
 #lang eopl
 
