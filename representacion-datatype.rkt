@@ -9,6 +9,10 @@
                                         output { cable }∗
               complex−circuit(circ lcircs in out )|#
 
+; CONSTRUCTORES
+; OBSERVADORES - PREDICADOS
+
+; OBSERVADORES - EXTRACTORES
 
 #|<chip> := <chip_prim>
          prim−chip ( chip−prim )
@@ -19,7 +23,10 @@
          comp−chip ( in , out , circ )
 |#
 
+; CONSTRUCTORES
+; OBSERVADORES - PREDICADOS
 
+; OBSERVADORES - EXTRACTORES
 
 #|<chip prim> := prim_or
                 chip−or ( )
@@ -36,3 +43,8 @@
               := prim xnor 
                 chip−xnor ( ) 
 |#
+
+; CONSTRUCTORES
+; OBSERVADORES - PREDICADOS
+
+; OBSERVADORES - EXTRACTORES
