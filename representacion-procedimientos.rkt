@@ -1,6 +1,6 @@
 #lang eopl
 ;Autores: Diana Oviedo 202459375, Juan Pablo Ospina 202411023
-; La representacion por procedimie ntos es una especie de empaquetamiento
+; La representacion por procedimientos es una especie de empaquetamiento
 ; y devuelve un lambda en vez de lista
 
 #| <circuito> := circ_simple({cable}∗)

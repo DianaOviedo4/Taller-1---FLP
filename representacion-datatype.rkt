@@ -14,12 +14,12 @@
 ;; Definir list-symbol?
 
 (define-datatype circuito circuitoSC?
-      (simple-circuit 
-        (chip symbol?); nombre-variante(id(cualquierCosa) predicado)                 
-        (cableIn (list-of symbol?))
+      (simple-circuit                
+        (cableIn (list-of symbol?)) ;nombre-variante(id(cualquierCosa)predicado)
         (cableOut (list-of symbol?))
+        (chip chiPC?)
         )
-      (complex-circuito
+      (complex-circuit
         (circ circuitoSC?)
         (lcircs (list-of circuitoSC?))
         (in (list-of symbol?))
@@ -37,16 +37,20 @@
 
 
 ; EXTRACTORES
-#|(define (imprimeCircuitos circuito)
-  (cases circuito circuitoSC
+
+#|(define imprimeCircuito
+  (lambda (circuitoSC)
+    (cases circuito circuitoSC 
       (simple-circuit (chip cableIn cableOut) 
-              printf "Circuito simple:\n- Chip: ~a\n- Entrada: ~a\n- Salida: ~a\n" 
+              "Circuito simple:\n- Chip: ~a\n- Entrada: ~a\n- Salida: ~a\n" 
               chip cableIn cableOut)
-      (complex-circuito (circ lcircs in out)
-              printf "Circuito complejo:\n- Subcircuito: ~a\n- Lista de circuitos: ~a\n- Entrada: ~a\n- Salida: ~a\n"
+      (complex-circuit (circ lcircs in out)
+              "Circuito complejo:\n- Subcircuito: ~a\n- Lista de circuitos: ~a\n- Entrada: ~a\n- Salida: ~a\n"
               circ lcircs in out)
+    (else eopl:error "Esto es un error del CIRC"))
   )
 )|#
+
 
 
 #|<chip> := <chip_prim>
@@ -62,7 +66,7 @@
 
 (define-datatype chip chiPC?
         (prim-chip
-          (chip-prim symbol?))
+          (chip-prim chip_prim?))
         (comp-chip
           (portIn (list-of symbol?))
           (portOut (list-of symbol?))
@@ -90,7 +94,7 @@
 
 ; CONSTRUCTORES
 ; OBSERVADORES - PREDICADOs
-(define-datatype chipPrim chip_prim?
+#|(define-datatype chipPrim chip_prim?
           (chip-or
            (prim_or symbol?))
           (chip-and
@@ -105,5 +109,84 @@
             (prim_nor symbol?))
           (chip-xnor
             (prim_xnor symbol?))
-)
+)|#
 
+(define-datatype chipPrim chip_prim?
+  (chip-or)
+  (chip-and)
+  (chip-not)
+  (chip-xor)
+  (chip-nand)
+  (chip-nor)
+  (chip-xnor))
+
+
+; ====================================== AREA DEL PROGRAMADOR =======================================
+(define b (comp-chip '(INA INB INC IND)
+           '(OUTA)
+           (complex-circuit (simple-circuit '(a b) '(e) (prim-chip (chip-and)))
+                            (list (simple-circuit '(c d) '(f) (prim-chip (chip-and)))
+                                  (simple-circuit '(e f) '(g) (prim-chip (chip-or))))
+                            '(a b c d)
+                            '(g))))
+
+(define a (complex-circuit
+ (simple-circuit '(m n o p)
+                 '(e f)
+                 (comp-chip '(INA INB INC IND)
+                            '(OUTD OUTF)
+                            (complex-circuit
+                             (simple-circuit '(a b) '(e) (prim-chip (chip-and)))
+                             (list (simple-circuit '(c d) '(f) (prim-chip (chip-and))))
+                             '(a b c d)
+                             '(e f))))
+ (list (simple-circuit
+        '(e f)
+        '(z)
+        (comp-chip '(INE INF) '(OUTA) (simple-circuit '(e f) '(g) (prim-chip (chip-or))))))
+ '(m n o p)
+ '(z)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#|
+
+(define b (comp-chip '(INA INB INC IND)
+           '(OUTA)
+           (complex-circuit (simple-circuit '(a b) '(e) (prim-chip (chip-and 'and)))
+                            (list (simple-circuit '(c d) '(f) (prim-chip (chip-and 'and)))
+                                  (simple-circuit '(e f) '(g) (prim-chip (chip-or 'or))))
+                            '(a b c d)
+                            '(g))))
+
+(define a (complex-circuit
+ (simple-circuit '(m n o p)
+                 '(e f)
+                 (comp-chip '(INA INB INC IND)
+                            '(OUTD OUTF)
+                            (complex-circuit
+                             (simple-circuit '(a b) '(e) (prim-chip (chip-and 'and)))
+                             (list (simple-circuit '(c d) '(f) (prim-chip (chip-and 'and))))
+                             '(a b c d)
+                             '(e f))))
+ (list (simple-circuit
+        '(e f)
+        '(z)
+        (comp-chip '(INE INF) '(OUTA) (simple-circuit '(e f) '(g) (prim-chip (chip-or 'or))))))
+ '(m n o p)
+ '(z)))
+|#
