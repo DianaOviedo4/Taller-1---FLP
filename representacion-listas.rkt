@@ -115,14 +115,6 @@
 
 ;; Area del programador
 ; Ejemplo de uso de los parsers y unparsers
-(define b (comp-chip '(INA INB INC IND)
-           '(OUTA)
-           (complex-circuit (simple-circuit '(a b) '(e) (prim-chip (chip-and)))
-                            (list (simple-circuit '(c d) '(f) (prim-chip (chip-and)))
-                                  (simple-circuit '(e f) '(g) (prim-chip (chip-or))))
-                            '(a b c d)
-                            '(g))))
-
 (define a (complex-circuit
  (simple-circuit '(m n o p)
                  '(e f)
@@ -139,6 +131,15 @@
         (comp-chip '(INE INF) '(OUTA) (simple-circuit '(e f) '(g) (prim-chip (chip-or))))))
  '(m n o p)
  '(z)))
+ 
+(define b (comp-chip '(INA INB INC IND)
+           '(OUTA)
+           (complex-circuit (simple-circuit '(a b) '(e) (prim-chip (chip-and)))
+                            (list (simple-circuit '(c d) '(f) (prim-chip (chip-and)))
+                                  (simple-circuit '(e f) '(g) (prim-chip (chip-or))))
+                            '(a b c d)
+                            '(g))))
+
 
 (define c
       (simple-circuit '(x y) '(z) (prim-chip (chip-xor))))
