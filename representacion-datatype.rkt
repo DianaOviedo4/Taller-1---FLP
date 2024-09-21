@@ -13,28 +13,19 @@
 ; CONSTRUCTORES Y PREDICADOS
 ;; Definir list-symbol?
 
-(define-datatype circuito circuitoSC?
+(define-datatype circuito circuito?
       (simple-circuit                
         (cableIn (list-of symbol?)) ;nombre-variante(id(cualquierCosa)predicado)
         (cableOut (list-of symbol?))
-        (chip chiPC?)
+        (chip chip?)
         )
       (complex-circuit
-        (circ circuitoSC?)
-        (lcircs (list-of circuitoSC?))
+        (circ circuito?)
+        (lcircs (list-of circuito?))
         (in (list-of symbol?))
         (out(list-of symbol?))
         )
 )
-
-;; Ejemplos de circuitos
-;(define circuito1 (simple-circuit 'chipA '(a b) '(out1 out2)))
-;(define circuito2 (complex-circuito circuito1 (list circuito1) '(in1 in2) '(out1)))
-
-;; Prueba de las instancias
-;(display circuito1)
-;(display circuito2)
-
 
 ; EXTRACTORES
 
@@ -64,13 +55,13 @@
 
 ; CONSTRUCTORES Y PREDICADOS
 
-(define-datatype chip chiPC?
+(define-datatype chip chip?
         (prim-chip
           (chip-prim chip_prim?))
         (comp-chip
           (portIn (list-of symbol?))
           (portOut (list-of symbol?))
-          (circuito circuitoSC?)
+          (circuito circuito?)
           )
 )
 
@@ -111,7 +102,7 @@
             (prim_xnor symbol?))
 )|#
 
-(define-datatype chipPrim chip_prim?
+(define-datatype chip_prim chip_prim?
   (chip-or)
   (chip-and)
   (chip-not)
@@ -147,46 +138,5 @@
  '(m n o p)
  '(z)))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#|
-
-(define b (comp-chip '(INA INB INC IND)
-           '(OUTA)
-           (complex-circuit (simple-circuit '(a b) '(e) (prim-chip (chip-and 'and)))
-                            (list (simple-circuit '(c d) '(f) (prim-chip (chip-and 'and)))
-                                  (simple-circuit '(e f) '(g) (prim-chip (chip-or 'or))))
-                            '(a b c d)
-                            '(g))))
-
-(define a (complex-circuit
- (simple-circuit '(m n o p)
-                 '(e f)
-                 (comp-chip '(INA INB INC IND)
-                            '(OUTD OUTF)
-                            (complex-circuit
-                             (simple-circuit '(a b) '(e) (prim-chip (chip-and 'and)))
-                             (list (simple-circuit '(c d) '(f) (prim-chip (chip-and 'and))))
-                             '(a b c d)
-                             '(e f))))
- (list (simple-circuit
-        '(e f)
-        '(z)
-        (comp-chip '(INE INF) '(OUTA) (simple-circuit '(e f) '(g) (prim-chip (chip-or 'or))))))
- '(m n o p)
- '(z)))
-|#
+(provide circuito chip chip_prim simple-circuit complex-circuit prim-chip comp-chip chip-or chip-and chip-not chip-xor chip-nand chip-nor chip-xnor
+        circuito? chip? chip_prim? circuito? )

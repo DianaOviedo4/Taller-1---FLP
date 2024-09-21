@@ -35,33 +35,60 @@
 
 ; Proposito: Construir el parser y unparser para pasar de sintaxis concreta a abstracta y viceversa
 #lang eopl
-;; Datatypes para el lenguaje de programación de circuitos digitales LCD
-(define-datatype circuito
-                 circuito?
-                 (simple-circuit (in (list-of symbol?)) ;nombre-variante(id(cualquierCosa)predicado)
-                                 (out (list-of symbol?))
-                                 (chip chip?))
-                 (complex-circuit (circ circuito?)
-                                  (lcircs (list-of circuito?))
-                                  (in (list-of symbol?))
-                                  (out (list-of symbol?))))
 
-(define-datatype chip
-                 chip?
-                 (prim-chip (chip-prim chip_prim?))
-                 (comp-chip (in (list-of symbol?)) (out (list-of symbol?)) (circ circuito?)))
+;; Importar el archivo representacion-datatype.rkt
+(require rackunit "representacion-datatype.rkt")
 
-(define-datatype chip_prim
-                 chip_prim?
-                 (chip-or)
-                 (chip-and)
-                 (chip-not)
-                 (chip-xor)
-                 (chip-nand)
-                 (chip-nor)
-                 (chip-xnor))
+;; Parser para el lenguaje de programación de circuitos digitales LCD
+;; Proposito: Convertir una expresión de listas a su representación abstracta (AST)
+(define parser
+  (lambda (exp)
+    (cond
+      [(eqv? (car exp) 'simple-circuit) (simple-circuit (cadr exp) (caddr exp) (parser (cadddr exp)))]
+      [(eqv? (car exp) 'complex-circuit)
+       (complex-circuit (parser (cadr exp)) (map parser (caddr exp)) (cadddr exp) (cadddr (cdr exp)))]
+      [(eqv? (car exp) 'prim-chip) (prim-chip (parser (cadr exp)))]
+      [(eqv? (car exp) 'comp-chip) (comp-chip (cadr exp) (caddr exp) (parser (cadddr exp)))]
+      [(eqv? (car exp) 'chip-or) (chip-or)]
+      [(eqv? (car exp) 'chip-and) (chip-and)]
+      [(eqv? (car exp) 'chip-not) (chip-not)]
+      [(eqv? (car exp) 'chip-xor) (chip-xor)]
+      [(eqv? (car exp) 'chip-nand) (chip-nand)]
+      [(eqv? (car exp) 'chip-nor) (chip-nor)]
+      [(eqv? (car exp) 'chip-xnor) (chip-xnor)])))
 
+;; Unparser para el lenguaje de programación de circuitos digitales LCD
+;; Proposito: Convertir una expresión de la representación abstracta a su sintaxis concreta (listas)
+(define unparse
+  (lambda (exp)
+    (cond
+      [(circuito? exp)
+       (cases circuito
+              exp
+              (simple-circuit (in out chip) (list 'simple-circuit in out (unparse chip)))
+              (complex-circuit (circ lcircs in out)
+                               (list 'complex-circuit (unparse circ) (map unparse lcircs) in out)))]
+
+      [(chip? exp)
+       (cases chip
+              exp
+              (prim-chip (chip_prim) (list 'prim-chip (unparse chip_prim)))
+              (comp-chip (in out circ) (list 'comp-chip in out (unparse circ))))]
+
+      [(chip_prim? exp)
+       (cases chip_prim
+              exp
+              (chip-or () (list 'chip-or))
+              (chip-and () (list 'chip-and))
+              (chip-not () (list 'chip-not))
+              (chip-xor () (list 'chip-xor))
+              (chip-nand () (list 'chip-nand))
+              (chip-nor () (list 'chip-nor))
+              (chip-xnor () (list 'chip-xnor)))]
+
+      [else (eopl:error "unparse: no se encuentra el caso" exp)])))
 ; ====================================== AREA DEL PROGRAMADOR =======================================
+; Ejemplo de uso de los parsers y unparsers
 (define a
   '(complex-circuit
     (simple-circuit (m n o p)
@@ -129,53 +156,8 @@
                      (simple-circuit (t u) (v) (prim-chip (chip-nand))))
                     (i j k n o q r t u)
                     (l m p s v)))
-;; Construir parse con datatypes
-(define parser
-  (lambda (exp)
-    (cond
-      [(eqv? (car exp) 'simple-circuit) (simple-circuit (cadr exp) (caddr exp) (parser (cadddr exp)))]
-      [(eqv? (car exp) 'complex-circuit)
-       (complex-circuit (parser (cadr exp)) (map parser (caddr exp)) (cadddr exp) (cadddr (cdr exp)))]
-      [(eqv? (car exp) 'prim-chip) (prim-chip (parser (cadr exp)))]
-      [(eqv? (car exp) 'comp-chip) (comp-chip (cadr exp) (caddr exp) (parser (cadddr exp)))]
-      [(eqv? (car exp) 'chip-or) (chip-or)]
-      [(eqv? (car exp) 'chip-and) (chip-and)]
-      [(eqv? (car exp) 'chip-not) (chip-not)]
-      [(eqv? (car exp) 'chip-xor) (chip-xor)]
-      [(eqv? (car exp) 'chip-nand) (chip-nand)]
-      [(eqv? (car exp) 'chip-nor) (chip-nor)]
-      [(eqv? (car exp) 'chip-xnor) (chip-xnor)])))
 
-;; Construir unparse con datatypes
-(define unparse
-  (lambda (exp)
-    (cond
-      [(circuito? exp)
-       (cases circuito
-              exp
-              (simple-circuit (in out chip) (list 'simple-circuit in out (unparse chip)))
-              (complex-circuit (circ lcircs in out)
-                               (list 'complex-circuit (unparse circ) (map unparse lcircs) in out)))]
-
-      [(chip? exp)
-       (cases chip
-              exp
-              (prim-chip (chip_prim) (list 'prim-chip (unparse chip_prim)))
-              (comp-chip (in out circ) (list 'comp-chip in out (unparse circ))))]
-
-      [(chip_prim? exp)
-       (cases chip_prim
-              exp
-              (chip-or () (list 'chip-or))
-              (chip-and () (list 'chip-and))
-              (chip-not () (list 'chip-not))
-              (chip-xor () (list 'chip-xor))
-              (chip-nand () (list 'chip-nand))
-              (chip-nor () (list 'chip-nor))
-              (chip-xnor () (list 'chip-xnor)))]
-
-      [else (eopl:error "unparse: no matching case" exp)])))
-
+;; Pruebas
 (display "-----------------Parsers-----------------")
 (newline)
 (display (parser a))
