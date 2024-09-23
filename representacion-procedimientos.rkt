@@ -1,5 +1,5 @@
 #lang eopl
-;Autores: Diana Oviedo 202459375, Juan Pablo Ospina 202411023
+;Autores: Diana Oviedo 202459375, Juan Pablo Ospina 202411023, Carlos Gutierrez 202059817
 ; La representacion por procedimientos es una especie de empaquetamiento
 ; y devuelve un lambda en vez de lista
 
@@ -11,11 +11,17 @@
                                         input { cable }∗
                                         output { cable }∗
               complex−circuit(circ lcircs in out )|#
+; Proposito :
+; Definir un TAD (Tipo abstracto de dato) basado en la representacion por procedimientos de un circuito
+; el cual puede ser simple o compuesto.
+
 ; CONSTRUIR INTERFAZ : PROCEDIMIENTOS:
-; CONSTRUCTORES
+; CONSTRUCTORES : Nos permite crear instancias de los circuitos con in, out, chips y subcircuitos (para los 
+; complejos).
+
 (define simple-circuit
       (lambda (in out chip)
-        (lambda (s)
+        (lambda (s) ; se define un selector o señal
             (cond
               [(= s 0) in]
               [(= s 1) out]
@@ -42,7 +48,7 @@
         )
   )
 
-; OBSERVADORES - PREDICADOS
+; OBSERVADORES - PREDICADOS : Verificar si el circuito simple y complejo tienen los componentes esperados.
 (define simple-circuit?
     (lambda(in out chip)
       (lambda (circuito) 
@@ -67,7 +73,8 @@
     )
 )
 
-; OBSERVADORES - EXTRACTORES
+; OBSERVADORES - EXTRACTORES : Nos permite acceder directamente a los diferentes componentes del circuito
+; ya sea simple o compuesto.
 ; CIRCUITO SIMPLE
 (define simple-circuit->cableIn
       (lambda (circuito)
@@ -100,6 +107,8 @@
         (circuito 3))
 )
 
+; ===============================================================================================================
+
 #|<chip> := <chip_prim>
          prim−chip ( chip−prim )
 
@@ -109,8 +118,13 @@
           comp−chip ( in , out , circ )
 |#
 
+; Proposito :
+; Definir un TAD (Tipo abstracto de dato) basado en la representacion por procedimientos de un chip
+; el cual puede ser primitivo o compuesto.
+;
 ; CONSTRUIR INTERFAZ : PROCEDIMIENTOS:
-; CONSTRUCTORES
+; CONSTRUCTORES : Nos permite crear instancias de los chips, ya sean primitivos o compuestos.
+
 (define prim-chip
     (lambda (chip-prim)
       (lambda (s)
@@ -138,7 +152,8 @@
 )
 
 
-; OBSERVADORES - PREDICADOS
+; OBSERVADORES - PREDICADOS : Verificar si el chip simple y complejo tienen los componentes esperados.
+
 (define prim-chip?
     (lambda (chip)
       (eq? ('prim chip) 'prim-chip )
@@ -148,15 +163,16 @@
 (define comp-chip?
     (lambda (in out circ)
       (lambda (chip)
-          (eq? (chip 0) 'in)
+         (eq? (chip 0) 'in)
           (eq? (chip 1) 'out)
           (eq? (chip 2) 'circ)
-          (eq? (chip 3) 'comp-chip)  
+          (eq? (chip 3) 'comp-chip)
       )
     )
   )
 
-; OBSERVADORES - EXTRACTORES
+; OBSERVADORES - EXTRACTORES : Nos permite acceder directamente a los diferentes componentes del chip
+; ya sea primitivo o compuesto.
 ; CHIP PRIMITIVO
 (define prim-chip->chip-prim
     (lambda (chip)
@@ -177,6 +193,7 @@
       (chip 2))
 )
 
+; ===============================================================================================================
 #|<chip prim> := prim_or
                 chip−or ( )
               := prim and
@@ -193,15 +210,19 @@
                 chip−xnor ( ) 
 |#
 
+; Proposito :
+; Definir un TAD (Tipo abstracto de dato) basado en la representacion por procedimientos de un chip primitivo.
+
 ; CONSTRUIR INTERFAZ : PROCEDIMIENTOS:
-; CONSTRUCTORES
+; CONSTRUCTORES : Nos permite crear instancias de los chips primitivos.
+
 (define chip-or 
     (lambda ()
       (lambda (s); s- Es una senal o selector 
         (cond
           [(equal? s 'or) 'chip-or]
           [(= s 1) '()] ; sobra
-          [else (eopl:error 'chip-or "No Existe la senal")]
+          [else (eopl:error 'chip-or "No Existe el selector")]
           )
       )
     )
@@ -212,7 +233,7 @@
       (lambda (s) ; s- Es una senal o selector 
         (cond
           [(equal? s 'and) 'chip-and]
-          [else (eopl:error 'chip-and "No Existe la senal")]
+          [else (eopl:error 'chip-and "No Existe el selector")]
           ) 
     )
   )
@@ -220,54 +241,64 @@
 
 
 (define chip-not
+  (lambda ()
     (lambda(s)
       (cond 
         [(equal? s 'not) 'chip-not]
-        [else (eopl:error 'chip-not "No Existe la senal")]
-      )
+        [else (eopl:error 'chip-not "No Existe el selector")]
+        )
     )
- )
+  )
+)
 
 (define chip-xor
+  (lambda ()
     (lambda(s)
       (cond
       [(equal? s 'xor) 'chip-xor]
-      [else (eopl:error 'chip-xor "No Existe la senal")]
+      [else (eopl:error 'chip-xor "No Existe el selector")]
       )
     )
+  )
 )
 
 
 (define chip-nand
+  (lambda ()
     (lambda(s)
       (cond
       [(equal? s 'nand) 'chip-nand]
-      [else (eopl:error 'chip-nand "No existe la senal")]
+      [else (eopl:error 'chip-nand "No existe el selector")]
       )
     )
+  )
 )
 
 
 (define chip-nor
+  (lambda ()
     (lambda(s)
       (cond
       [(equal? s 'nor) 'chip-nor]
-      [else (eopl:error 'chip-nor "No existe la senal")]
+      [else (eopl:error 'chip-nor "No existe el selector")]
       )
     )
+  )
 )
 
 
 (define chip-xnor
+  (lambda ()
     (lambda(s)
       (cond
       [(equal? s 'xnor) 'chip-xnor]
-      [else (eopl:error 'chip-xnor "NO existe la senal")]
+      [else (eopl:error 'chip-xnor "NO existe el selector")]
       )
     )
+  )
 )
 
-; OBSERVADORES - PREDICADOS
+; OBSERVADORES - PREDICADOS : Verificar si los chips primitivos tienen los componentes esperados.
 
 (define chip-or?
     (lambda (chip_prim)
@@ -341,3 +372,47 @@
         (comp-chip '(INE INF) '(OUTA) (simple-circuit '(e f) '(g) (prim-chip (chip-or))))))
  '(m n o p)
  '(z)))
+; =========================================================================================================
+(define c (complex-circuit
+  (simple-circuit '(a b c d)
+                  '(x y)
+                  (comp-chip '(INL INM INN INO)
+                             '(OUTP OUTQ)
+                             (complex-circuit
+                              (simple-circuit '(e f) '(g) (prim-chip (chip-nor)))
+                              (list (simple-circuit '(h i) '(j) (prim-chip (chip-and))))
+                              '(e f h i)
+                              '(g j))))
+  (list (simple-circuit '(x y)
+                        '(z)
+                        (comp-chip '(INI INJ) '(OUTI) (simple-circuit '(x y) '(z) (prim-chip (chip-xor))))))
+  '(a b c d)
+  '(z)))
+
+(define d (comp-chip '(INA INB INC IND)
+           '(OUTC)
+           (complex-circuit (simple-circuit '(m n) '(o) (prim-chip (chip-nand)))
+                            (list (simple-circuit '(p q) '(r) (prim-chip (chip-xnor)))
+                                  (simple-circuit '(o r) '(s) (prim-chip (chip-or))))
+                            '(m n p q)
+                            '(s))))
+; ===========================================================================================================
+(define e
+  (comp-chip '(IN1 IN2 IN3)
+              '(OUT1 OUT2)
+              (complex-circuit (simple-circuit '(p q) '(r) (prim-chip (chip-and)))
+                               (list (simple-circuit '(s t) '(u) (prim-chip (chip-nor)))
+                                  (simple-circuit '(v w) '(x) (prim-chip (chip-xor))))
+                               '(p q s t v w)
+                               '(r u x))))
+; =========================================================================================================================
+(define f
+        (complex-circuit (simple-circuit '(a b) '(c) (prim-chip (chip-or)))
+                               (list(simple-circuit '(d e) '(f) (prim-chip (chip-and)))
+                                (simple-circuit '(g h) '(i) (prim-chip (chip-xnor))))
+                               '(a b d e g h)
+                               '(c f i)))
+
+; =========================================================================================================================
+(define g
+  (simple-circuit '(x y) '(z) (prim-chip (chip-xor))))
